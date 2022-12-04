@@ -1,21 +1,23 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Chat, { Bubble, useMessages } from "@chatui/core";
-import "@chatui/core/es/styles/index.less";
 import "@chatui/core/dist/index.css";
+import "@chatui/core/es/styles/index.less";
+import "./index.css";
+import './chatui-theme.css';
 
 const initialMessages = [
   {
     type: "text",
     content: { text: "Howdy! I'm SoulBot!" },
     user: {
-      avatar: "//gw.alicdn.com/tfs/TB1DYHLwMHqK1RjSZFEXXcGMXXa-56-62.svg",
+      avatar: "https://github.com/HumanRupert/lauzhack_chatbot/blob/master/public/logo.jpg",
     },
   },
   {
     type: "text",
     content: { text: "What are you struggling with today?" },
     user: {
-      avatar: "//gw.alicdn.com/tfs/TB1DYHLwMHqK1RjSZFEXXcGMXXa-56-62.svg",
+      avatar: "https://github.com/HumanRupert/lauzhack_chatbot/blob/master/public/logo.jpg",
     },
   },
 ];
@@ -36,7 +38,7 @@ const defaultQuickReplies = [
     isHighlight: true,
   },
   {
-    name: "Overwhelmed",
+    name: "Exhaustion",
   },
   {
     name: "Guilt",
@@ -50,12 +52,22 @@ const defaultQuickReplies = [
   {
     name: "Helplessness",
   },
+  {
+    name: "Regret",
+  },
+  {
+    name: "Heartbreak",
+  },
 ];
 
 const App = () => {
+  useEffect(() => {
+    document.title = 'SoulBot';
+  }, []);
+
   const { messages, appendMsg, setTyping } = useMessages(initialMessages);
 
-  function handleSend(type, val) {
+  async function handleSend(type, val) {
     if (type === "text" && val.trim()) {
       appendMsg({
         type: "text",
@@ -65,17 +77,19 @@ const App = () => {
 
       setTyping(true);
 
-      setTimeout(() => {
-        appendMsg({
-          type: "text",
-          content: {
-            text: "Lorem Impsum Dolor Si Amet",
-          },
-          user: {
-            avatar: "//gw.alicdn.com/tfs/TB1DYHLwMHqK1RjSZFEXXcGMXXa-56-62.svg",
-          },
-        });
-      }, 1000);
+      const res = await (await fetch("http://127.0.0.1:8000/" + val)).json()
+      console.log(res)
+
+      appendMsg({
+        type: "text",
+        content: {
+          text: res,
+        },
+        user: {
+          avatar: "https://github.com/HumanRupert/lauzhack_chatbot/blob/master/public/logo.jpg",
+        },
+      });
+
     }
   }
 
@@ -100,8 +114,8 @@ const App = () => {
     }
   }
 
-  return (
-    <Chat
+  return <Chat
+      locale='zh-CN'
       navbar={{ title: "SoulBot" }}
       messages={messages}
       renderMessageContent={renderMessageContent}
@@ -109,7 +123,7 @@ const App = () => {
       onQuickReplyClick={handleQuickReplyClick}
       onSend={handleSend}
     />
-  );
+  
 };
 
 export default App;
